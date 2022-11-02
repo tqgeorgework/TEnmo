@@ -8,7 +8,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,10 +65,7 @@ public class JdbcUserDao implements UserDao {
         } catch (DataAccessException e) {
             return false;
         }
-
-        int startingBalance = 1000;
-        sql = "INSERT INTO account (user_id, balance) VALUES (?, ?)";
-        jdbcTemplate.queryForObject(sql, Integer.class, newUserId, startingBalance);
+        //createAccount(newUserId);
         return true;
     }
 

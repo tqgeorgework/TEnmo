@@ -13,8 +13,6 @@ import java.util.List;
 public class MemoryAccountDao implements AccountDao {
     private JdbcTemplate jdbcTemplate;
 
-    //public MemoryAccountDao() {}
-
     public MemoryAccountDao() {
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -25,6 +23,7 @@ public class MemoryAccountDao implements AccountDao {
         return jdbcTemplate.queryForObject(sql, BigDecimal.class, accountId);
     }
 
+    @Override
     public List<Account> getAccounts() {
         List<Account> accounts = new ArrayList<>();
         String sql = "SELECT * FROM account;";
@@ -33,6 +32,13 @@ public class MemoryAccountDao implements AccountDao {
             accounts.add(mapRowToAccount(results));
         }
         return accounts;
+    }
+
+    @Override
+    public Account createAccount(int newUserId) {
+        int startingBalance = 1000;
+        String sql = "INSERT INTO account (user_id, balance) VALUES (?, ?)";
+        return jdbcTemplate.queryForObject(sql, Account.class, newUserId, startingBalance);
     }
 
     private Account mapRowToAccount(SqlRowSet results) {
