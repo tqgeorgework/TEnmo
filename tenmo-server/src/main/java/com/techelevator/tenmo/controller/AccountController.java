@@ -1,10 +1,8 @@
 package com.techelevator.tenmo.controller;
 
 
-import com.techelevator.tenmo.dao.AccountDao;
-import com.techelevator.tenmo.dao.MemoryAccountDao;
-import com.techelevator.tenmo.dao.MemoryTransferDao;
-import com.techelevator.tenmo.dao.TransferDao;
+import com.techelevator.tenmo.dao.*;
+import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -21,12 +19,12 @@ public class AccountController {
     private AccountDao accountDao;
     private TransferDao transferDao;
 
-    public AccountController() {
+    public AccountController(AccountDao accountDao, TransferDao transferDao) {
         this.accountDao = new MemoryAccountDao();
         this.transferDao = new MemoryTransferDao();
     }
 
-    @RequestMapping(path = "/{id}", method = RequestMethod.GET)
+    @RequestMapping(path = "/{accountId}", method = RequestMethod.GET)
     public BigDecimal getBalance(@PathVariable int id) {
         return accountDao.getBalance(id);
     }
@@ -39,6 +37,11 @@ public class AccountController {
     @RequestMapping(path = "/{accountId}/transfer", method = RequestMethod.GET)
     public List<Transfer> getTransfer(@PathVariable int accountId) {
         return transferDao.getTransfers(accountId);
+    }
+
+    @RequestMapping(path = "", method = RequestMethod.GET)
+    public List<Account> getAccounts() {
+        return accountDao.getAccounts();
     }
 
 }

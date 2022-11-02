@@ -69,7 +69,7 @@ public class JdbcUserDao implements UserDao {
 
         int startingBalance = 1000;
         sql = "INSERT INTO account (user_id, balance) VALUES (?, ?)";
-        jdbcTemplate.update(sql, newUserId, startingBalance);
+        jdbcTemplate.queryForObject(sql, Integer.class, newUserId, startingBalance);
         return true;
     }
 
