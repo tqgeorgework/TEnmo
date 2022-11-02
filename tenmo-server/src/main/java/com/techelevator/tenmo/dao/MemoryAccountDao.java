@@ -1,18 +1,17 @@
 package com.techelevator.tenmo.dao;
 
-import com.techelevator.tenmo.model.Transfer;
+import com.techelevator.tenmo.model.Account;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class MemoryAccountDao implements AccountDao {
     private JdbcTemplate jdbcTemplate;
 
-    public MemoryAccountDao(JdbcTemplate jdbcTemplate) {
+    public MemoryAccountDao() {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -22,15 +21,8 @@ public class MemoryAccountDao implements AccountDao {
         return jdbcTemplate.queryForObject(sql, BigDecimal.class, accountId);
     }
 
-    @Override
-    public List<Transfer> getTransfers() {
-        List<Transfer> transfers = new ArrayList<>();
-        return transfers;
-    }
-
-    @Override
-    public Transfer getTransfer() {
-        Transfer transfer = new Transfer(1, BigDecimal.ONE, 1, 1);
-        return transfer;
+    private Account mapRowToAccount(SqlRowSet results) {
+        Account account = new Account(results.getInt("account_id"), results.getInt("user_id"), results.getBigDecimal("balance"));
+        return account;
     }
 }
