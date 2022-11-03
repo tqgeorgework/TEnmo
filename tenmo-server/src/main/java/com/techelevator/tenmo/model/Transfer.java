@@ -1,5 +1,6 @@
 package com.techelevator.tenmo.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.validation.constraints.NotBlank;
@@ -12,6 +13,7 @@ public class Transfer {
     @NotNull
     private int transferId;
     @NotNull
+    @JsonFormat (shape = JsonFormat.Shape.STRING)
     private BigDecimal amount;
     @NotNull
     private int senderId;

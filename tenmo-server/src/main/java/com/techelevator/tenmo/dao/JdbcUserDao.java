@@ -2,11 +2,13 @@ package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.model.User;
 import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,16 +17,17 @@ import java.util.List;
 public class JdbcUserDao implements UserDao {
 
     private JdbcTemplate jdbcTemplate;
-    private JdbcAccountDao accountDao;
+    private AccountDao accountDao;
+    //private JdbcAccountDao accountDao;
 
-    public JdbcUserDao(JdbcTemplate jdbcTemplate, JdbcAccountDao accountDao) {
+    public JdbcUserDao(JdbcTemplate jdbcTemplate, AccountDao accountDao) {
         this.jdbcTemplate = jdbcTemplate;
-        accountDao = this.accountDao;
+        this.accountDao = accountDao;
     }
 
     @Override
     public int findIdByUsername(String username) {
-        String sql = "SELECT user_id FROM tenmo_user WHERE username ILIKE ?;";
+        String sql = "SELECT user_id FROM tenmo_user WHERE username = ?;";
         Integer id = jdbcTemplate.queryForObject(sql, Integer.class, username);
         if (id != null) {
             return id;
@@ -56,10 +59,10 @@ public class JdbcUserDao implements UserDao {
     }
 
     @Override
+    @ResponseStatus(HttpStatus.CREATED)
     public boolean create(String username, String password) {
-
         // create user
-        String sql = "INSERT INTO tenmo_user (username, password_hash) VALUES (?, ?) RETURNING user_id";
+        String sql = "INSERT INTO tenmo_user (user_id, username, password_hash) VALUES (DEFAULT, ?, ?) RETURNING user_id";
         String password_hash = new BCryptPasswordEncoder().encode(password);
         Integer newUserId;
         try {
@@ -70,6 +73,18 @@ public class JdbcUserDao implements UserDao {
         accountDao.createAccount(newUserId);
         return true;
     }
+
+//    @Override
+//    // Todo
+//    // remove/comment out, only for testing purposes
+//    public void deleteEverything() {
+//        String sql = "BEGIN TRANSACTION;" +
+//                " DELETE FROM tenmo_user" +
+//                " DELETE FROM account" +
+//                " DELETE FROM transfer" +
+//                " COMMIT;";
+//        jdbcTemplate.update(sql);
+//    }
 
     private User mapRowToUser(SqlRowSet rs) {
         User user = new User();

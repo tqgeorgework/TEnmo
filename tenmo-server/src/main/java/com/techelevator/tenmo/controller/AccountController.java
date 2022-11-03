@@ -6,6 +6,9 @@ import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -22,16 +25,23 @@ public class AccountController {
 
     private AccountDao accountDao;
     private TransferDao transferDao;
-    //private UserDao userDao;
+    private UserDao userDao;
 
-    public AccountController(AccountDao accountDao, TransferDao transferDao) {
+    public AccountController(AccountDao accountDao, TransferDao transferDao, UserDao userDao) {
         this.accountDao = accountDao;
         this.transferDao = transferDao;
-        //this.userDao = new JdbcUserDao(new JdbcTemplate());
+        this.userDao = userDao;
     }
 
-    @RequestMapping(path = "/{accountId}", method = RequestMethod.GET)
-    public BigDecimal getBalance(@PathVariable int accountId) {
+    //Todo
+    //method is feeding wrong information to accountDao.getBalance, need to resolve so that user can input Account Id and receive expected result
+
+    @RequestMapping(path = "/{accountId}/balance", method = RequestMethod.GET)
+    public BigDecimal getBalance(@PathVariable int accountId, Principal principal) {
+        if (!(accountDao.findAccountIdByUserId(userDao.findIdByUsername(principal.getName())) == accountId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot access another user's balance " + principal.getName() +
+                    " " + userDao.findIdByUsername(principal.getName()));
+        }
         return accountDao.getBalance(accountId);
     }
 
@@ -55,10 +65,10 @@ public class AccountController {
         return accountDao.getAccounts();
     }
 
-/*    @RequestMapping(path = "/create/{id}", method = RequestMethod.POST)
+    @RequestMapping(path = "/create/{id}", method = RequestMethod.POST)
     public Account createAccount(@PathVariable int id) {
         return accountDao.createAccount(id);
-    }*/
+    }
 
     @RequestMapping(path = "/{accountId}/transfers/{receiverId}", method = RequestMethod.POST)
     public Transfer createTransfer(@PathVariable int accountId, @PathVariable int receiverId,
@@ -77,6 +87,11 @@ public class AccountController {
         }
         return transfer;
     }
+
+//    @RequestMapping (path = "/deleteall", method = RequestMethod.DELETE)
+//    public void delete() {
+//        userDao.deleteEverything();
+//    }
 
     @RequestMapping (path = "/{accountId}/transfers/{transferId}", method = RequestMethod.PUT)
     public void completeTransfer() {

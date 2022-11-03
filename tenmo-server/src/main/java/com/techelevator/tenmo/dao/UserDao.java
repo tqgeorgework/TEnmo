@@ -13,4 +13,8 @@ public interface UserDao {
     int findIdByUsername(String username);
 
     boolean create(String username, String password);
+
+    //Todo
+    //delete or comment out, testing purposes only
+//    public void deleteEverything();
 }

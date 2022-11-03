@@ -35,6 +35,17 @@ public class JdbcAccountDao implements AccountDao {
     }
 
     @Override
+    public int findAccountIdByUserId(int id) {
+        String sql = "SELECT account_id FROM account WHERE user_id = ?;";
+        Integer accountId = jdbcTemplate.queryForObject(sql, Integer.class, id);
+        if (accountId != null) {
+            return id;
+        } else {
+            return -1;
+        }
+    }
+
+    @Override
     public Account createAccount(int newUserId) {
         int startingBalance = 1000;
         String sql = "INSERT INTO account (user_id, balance) VALUES (?, ?)";

@@ -1,0 +1,17 @@
+insert into tenmo_user VALUES (1001, 'test1', 'password1');
+insert into tenmo_user VALUES (1002, 'test2', 'password2');
+insert into account VALUES(2001, 1001, 1000);
+insert into account VALUES(2002, 1002, 1000);
+insert into transfer VALUES(DEFAULT, 1, 2001, 2002);
+insert into transfer VALUES(DEFAULT, 1, 2001, 2002);
+select * from transfer;
+
+BEGIN TRANSACTION;
+UPDATE account SET balance = balance - ? WHERE account_number = ?;
+UPDATE account SET balance = balance + ? WHERE account_number = ?;
+COMMIT;
+
+{
+    "username" : "extremetestuser",
+    "password" : "password"
+}
