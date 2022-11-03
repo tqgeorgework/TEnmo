@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.List;
@@ -39,19 +40,19 @@ public class AccountController {
     @RequestMapping(path = "/{accountId}/balance", method = RequestMethod.GET)
     public BigDecimal getBalance(@PathVariable int accountId, Principal principal) {
         if (!(accountDao.findAccountIdByUserId(userDao.findIdByUsername(principal.getName())) == accountId)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot access another user's balance " + principal.getName() +
-                    " " + userDao.findIdByUsername(principal.getName()));
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot access another user's balance");
         }
         return accountDao.getBalance(accountId);
     }
 
-    @RequestMapping(path = "/{accountId}/transfers/{transferId}", method = RequestMethod.GET)
-    public Transfer getThisTransfer(@PathVariable int accountId, @PathVariable int transferId) {
+    @RequestMapping(path = "/{accountId}/transfers/{receiverId}/{transferId}", method = RequestMethod.GET)
+    public Transfer getThisTransfer(@PathVariable int accountId, @PathVariable int receiverId,
+                                    @PathVariable int transferId) {
         return transferDao.getTransfer(transferId);
     }
 
     @RequestMapping(path = "/{accountId}/transfers", method = RequestMethod.GET)
-    public List<Transfer> getTransfer(@PathVariable int accountId) {
+    public List<Transfer> getTransfers(@PathVariable int accountId) {
         return transferDao.getTransfers(accountId);
     }
 
@@ -70,10 +71,12 @@ public class AccountController {
         return accountDao.createAccount(id);
     }
 
-    @RequestMapping(path = "/{accountId}/transfers/{receiverId}", method = RequestMethod.POST)
+    @RequestMapping(path = "/{accountId}/transfers/{receiverId}/", method = RequestMethod.POST)
     public Transfer createTransfer(@PathVariable int accountId, @PathVariable int receiverId,
                                  @RequestBody BigDecimal amount, Principal principal) {
         Transfer transfer;
+        //Todo Implement principal
+        // question about JSON syntax w/ transferring amount
         if (amount.compareTo(accountDao.getBalance(accountId)) > 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient Funds");
         } else if (amount.compareTo(BigDecimal.ZERO) < 0) {
