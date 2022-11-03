@@ -10,10 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class MemoryAccountDao implements AccountDao {
+public class JdbcAccountDao implements AccountDao {
     private JdbcTemplate jdbcTemplate;
 
-    public MemoryAccountDao() {
+    public JdbcAccountDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -26,7 +26,7 @@ public class MemoryAccountDao implements AccountDao {
     @Override
     public List<Account> getAccounts() {
         List<Account> accounts = new ArrayList<>();
-        String sql = "SELECT * FROM account;";
+        String sql = "SELECT account_id, user_id, balance FROM account;";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
         while (results.next()) {
             accounts.add(mapRowToAccount(results));

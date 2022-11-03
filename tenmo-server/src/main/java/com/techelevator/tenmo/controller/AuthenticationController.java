@@ -62,11 +62,11 @@ public class AuthenticationController {
         }
     }
 
-/*    //Todo Erase this
+    //Todo Erase this
     @RequestMapping(value = "/users", method = RequestMethod.GET)
     public List<User> getUsers() {
         return userDao.findAll();
-    }*/
+    }
 
 
     /**

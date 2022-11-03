@@ -15,9 +15,11 @@ import java.util.List;
 public class JdbcUserDao implements UserDao {
 
     private JdbcTemplate jdbcTemplate;
+    private JdbcAccountDao accountDao;
 
-    public JdbcUserDao(JdbcTemplate jdbcTemplate) {
+    public JdbcUserDao(JdbcTemplate jdbcTemplate, JdbcAccountDao accountDao) {
         this.jdbcTemplate = jdbcTemplate;
+        accountDao = this.accountDao;
     }
 
     @Override
@@ -65,7 +67,7 @@ public class JdbcUserDao implements UserDao {
         } catch (DataAccessException e) {
             return false;
         }
-        //createAccount(newUserId);
+        accountDao.createAccount(newUserId);
         return true;
     }
 
