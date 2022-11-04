@@ -61,25 +61,15 @@ public class AccountController {
         return transferDao.getTransfers(accountId);
     }
 
-/*    @RequestMapping(path = "/{accountId}/transfers", method = RequestMethod.GET)
-    public List<Transfer> getPendingTransfers(@PathVariable int accountId) {
-        return transferDao.getTransfers(accountId);
-    }*/
-
     @RequestMapping(path = "", method = RequestMethod.GET)
     public List<Account> getAccounts() {
         return accountDao.getAccounts();
     }
 
-//    @RequestMapping(path = "/create/{id}", method = RequestMethod.POST)
-//    public Account createAccount(@PathVariable int id) {
-//        return accountDao.createAccount(id);
-//    }
-
     @RequestMapping(path = "/{accountId}/transfers/{receiverId}", method = RequestMethod.POST)
     public Transfer createTransfer(@PathVariable int accountId, @PathVariable int receiverId,
                                    @RequestBody Transfer transfer, Principal principal) {
-        {/*if (isNotAuthorized(accountId, principal)) {
+        if (isNotAuthorized(accountId, principal)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot initiate a transfer for another user's account");
         } else if (transfer.getAmount().compareTo(accountDao.getBalance(accountId)) > 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient Funds");
@@ -87,7 +77,7 @@ public class AccountController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot send negative amounts");
         } else if (accountId == receiverId) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot send funds to yourself");
-        } else {*/
+        } else {
             transfer = transferDao.createTransfer(transfer.getAmount(), accountId, receiverId);
             transfer.setStatus(APPROVED);
             transferDao.completeTransfer(transfer);
