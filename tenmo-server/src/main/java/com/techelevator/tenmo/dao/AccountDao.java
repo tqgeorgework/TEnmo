@@ -10,6 +10,6 @@ public interface AccountDao {
 
     BigDecimal getBalance(int accountId);
     List<Account> getAccounts();
-    Account createAccount(int newUserId);
+    void createAccount(int newUserId);
     int findAccountIdByUserId(int id);
 }

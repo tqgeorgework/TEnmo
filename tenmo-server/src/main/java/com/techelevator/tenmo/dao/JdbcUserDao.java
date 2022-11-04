@@ -58,7 +58,6 @@ public class JdbcUserDao implements UserDao {
     }
 
     @Override
-    @ResponseStatus(HttpStatus.CREATED)
     public boolean create(String username, String password) {
         // create user
         String sql = "INSERT INTO tenmo_user (user_id, username, password_hash) VALUES (DEFAULT, ?, ?) RETURNING user_id";

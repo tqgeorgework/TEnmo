@@ -48,10 +48,10 @@ public class JdbcAccountDao implements AccountDao {
     }
 
     @Override
-    public Account createAccount(int newUserId) {
+    public void createAccount(int newUserId) {
         int startingBalance = 1000;
         String sql = "INSERT INTO account (user_id, balance) VALUES (?, ?)";
-        return jdbcTemplate.queryForObject(sql, Account.class, newUserId, startingBalance);
+        jdbcTemplate.update(sql, newUserId, startingBalance);
     }
 
     private Account mapRowToAccount(SqlRowSet results) {

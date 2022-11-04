@@ -41,9 +41,9 @@ public class JdbcTransferDao implements TransferDao {
 
     @Override
     public Transfer createTransfer(BigDecimal balance, int senderId, int receiverId) {
-        String sql = "INSERT into transfer (transfer_id, amount, sender_id, receiver_id)" +
-                " VALUES (DEFAULT, ?, ?, ?) RETURNING transfer_id;";
-        Integer id = jdbcTemplate.update(sql, Integer.class, balance, senderId, receiverId);
+        String sql = "INSERT into transfer (amount, sender_id, receiver_id)" +
+                " VALUES (?, ?, ?) RETURNING transfer_id;";
+        Integer id = jdbcTemplate.queryForObject(sql, Integer.class, balance, senderId, receiverId);
         return getTransfer(id);
     }
 
@@ -53,7 +53,7 @@ public class JdbcTransferDao implements TransferDao {
                 " UPDATE account SET balance = balance - ? WHERE account_id = ?;" +
                 " UPDATE account SET balance = balance + ? WHERE account_id = ?;" +
                 " COMMIT;";
-        jdbcTemplate.queryForRowSet(sql, Transfer.class, transfer.getAmount(), transfer.getSenderId(), transfer.getAmount(), transfer.getReceiverId());
+        jdbcTemplate.update(sql, transfer.getAmount(), transfer.getSenderId(), transfer.getAmount(), transfer.getReceiverId());
     }
 
     private Transfer mapRowToTransfer(SqlRowSet results) {

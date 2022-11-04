@@ -71,12 +71,12 @@ public class AccountController {
         return accountDao.getAccounts();
     }
 
-    @RequestMapping(path = "/create/{id}", method = RequestMethod.POST)
-    public Account createAccount(@PathVariable int id) {
-        return accountDao.createAccount(id);
-    }
+//    @RequestMapping(path = "/create/{id}", method = RequestMethod.POST)
+//    public Account createAccount(@PathVariable int id) {
+//        return accountDao.createAccount(id);
+//    }
 
-    @RequestMapping(path = "/{accountId}/transfers/{receiverId}/", method = RequestMethod.POST)
+    @RequestMapping(path = "/{accountId}/transfers/{receiverId}", method = RequestMethod.POST)
     public Transfer createTransfer(@PathVariable int accountId, @PathVariable int receiverId,
                                    @RequestBody Transfer transfer, Principal principal) {
         {/*if (isNotAuthorized(accountId, principal)) {
