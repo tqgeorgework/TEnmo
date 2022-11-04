@@ -18,9 +18,12 @@ public class TenmoApplication {
         SpringApplication.run(TenmoApplication.class, args);
     }
 
-    /**
+/*
+    */
+/**
      * Prints all the requests mappings registered by all the controllers
-     */
+     *//*
+
     @EventListener
     public void handleContextRefresh(ContextRefreshedEvent event) {
         ApplicationContext applicationContext = event.getApplicationContext();
@@ -34,5 +37,6 @@ public class TenmoApplication {
         }
         System.out.println();
     }
+*/
 
 }

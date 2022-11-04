@@ -60,7 +60,8 @@ public class AuthenticationController {
         }
     }
 
-    //Todo Erase this
+    //TODO Erase
+    // This method for testing purposes only
     @RequestMapping(value = "/users", method = RequestMethod.GET)
     public List<User> getUsers() {
         return userDao.findAll();

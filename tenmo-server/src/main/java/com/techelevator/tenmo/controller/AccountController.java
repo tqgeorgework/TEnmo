@@ -21,7 +21,7 @@ import static com.techelevator.tenmo.model.Status.APPROVED;
 
 @RestController
 @PreAuthorize("isAuthenticated()")
-@RequestMapping("/accounts")
+@RequestMapping("/accounts/")
 public class AccountController {
 
     private AccountDao accountDao;
@@ -34,7 +34,7 @@ public class AccountController {
         this.userDao = userDao;
     }
 
-    @RequestMapping(path = "/{accountId}/balance", method = RequestMethod.GET)
+    @RequestMapping(path = "{accountId}/balance", method = RequestMethod.GET)
     public BigDecimal getBalance(@PathVariable int accountId, Principal principal) {
         if (isNotAuthorized(accountId, principal)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot access another user's balance");
@@ -42,18 +42,19 @@ public class AccountController {
         return accountDao.getBalance(accountId);
     }
 
-    @RequestMapping(path = "/{accountId}/transfers/{receiverId}/{transferId}", method = RequestMethod.GET)
-    //TOdo sender can check transfers according to their own id
-    // Account Id isn't doing anything
-    public Transfer getThisTransfer(@PathVariable int accountId, @PathVariable int receiverId,
+    @RequestMapping(path = "{accountId}/transfers/{transferId}", method = RequestMethod.GET)
+    public Transfer getThisTransfer(@PathVariable int accountId,
                                     @PathVariable int transferId, Principal principal) {
-        if (isNotAuthorized(accountId, principal) && isNotAuthorized(receiverId, principal)) {
+        if ((transferDao.getTransfer(transferId).getReceiverId() != accountId &&
+                transferDao.getTransfer(transferId).getSenderId() != accountId) ||
+                isNotAuthorized(accountId, principal))
+        {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot view another user's transactions");
         }
         return transferDao.getTransfer(transferId);
     }
 
-    @RequestMapping(path = "/{accountId}/transfers", method = RequestMethod.GET)
+    @RequestMapping(path = "{accountId}/transfers", method = RequestMethod.GET)
     public List<Transfer> getTransfers(@PathVariable int accountId, Principal principal) {
         if (isNotAuthorized(accountId, principal)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot view another user's transactions");
@@ -66,7 +67,7 @@ public class AccountController {
         return accountDao.getAccounts();
     }
 
-    @RequestMapping(path = "/{accountId}/transfers/{receiverId}", method = RequestMethod.POST)
+    @RequestMapping(path = "{accountId}/transfers/{receiverId}", method = RequestMethod.POST)
     public Transfer createTransfer(@PathVariable int accountId, @PathVariable int receiverId,
                                    @RequestBody Transfer transfer, Principal principal) {
         if (isNotAuthorized(accountId, principal)) {
@@ -85,7 +86,7 @@ public class AccountController {
         return transfer;
     }
 
-    @RequestMapping(path = "/{accountId}/transfers/{transferId}", method = RequestMethod.PUT)
+    @RequestMapping(path = "{accountId}/transfers/{transferId}", method = RequestMethod.PUT)
     public void completeTransfer(Transfer transfer) {
         transfer.setStatus(APPROVED);
         transferDao.completeTransfer(transfer);
