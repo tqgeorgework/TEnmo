@@ -18,7 +18,6 @@ public class JdbcUserDao implements UserDao {
 
     private JdbcTemplate jdbcTemplate;
     private AccountDao accountDao;
-    //private JdbcAccountDao accountDao;
 
     public JdbcUserDao(JdbcTemplate jdbcTemplate, AccountDao accountDao) {
         this.jdbcTemplate = jdbcTemplate;
@@ -73,18 +72,6 @@ public class JdbcUserDao implements UserDao {
         accountDao.createAccount(newUserId);
         return true;
     }
-
-//    @Override
-//    // Todo
-//    // remove/comment out, only for testing purposes
-//    public void deleteEverything() {
-//        String sql = "BEGIN TRANSACTION;" +
-//                " DELETE FROM tenmo_user" +
-//                " DELETE FROM account" +
-//                " DELETE FROM transfer" +
-//                " COMMIT;";
-//        jdbcTemplate.update(sql);
-//    }
 
     private User mapRowToUser(SqlRowSet rs) {
         User user = new User();

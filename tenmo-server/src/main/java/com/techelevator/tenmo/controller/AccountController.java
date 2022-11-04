@@ -43,6 +43,8 @@ public class AccountController {
     }
 
     @RequestMapping(path = "/{accountId}/transfers/{receiverId}/{transferId}", method = RequestMethod.GET)
+    //TOdo sender can check transfers according to their own id
+    // Account Id isn't doing anything
     public Transfer getThisTransfer(@PathVariable int accountId, @PathVariable int receiverId,
                                     @PathVariable int transferId, Principal principal) {
         if (isNotAuthorized(accountId, principal) && isNotAuthorized(receiverId, principal)) {
@@ -77,9 +79,7 @@ public class AccountController {
     @RequestMapping(path = "/{accountId}/transfers/{receiverId}/", method = RequestMethod.POST)
     public Transfer createTransfer(@PathVariable int accountId, @PathVariable int receiverId,
                                    @RequestBody Transfer transfer, Principal principal) {
-        //Todo Implement principal
-        // question about JSON syntax w/ transferring amount
-        if (isNotAuthorized(accountId, principal)) {
+        {/*if (isNotAuthorized(accountId, principal)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot initiate a transfer for another user's account");
         } else if (transfer.getAmount().compareTo(accountDao.getBalance(accountId)) > 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient Funds");
@@ -87,7 +87,7 @@ public class AccountController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot send negative amounts");
         } else if (accountId == receiverId) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot send funds to yourself");
-        } else {
+        } else {*/
             transfer = transferDao.createTransfer(transfer.getAmount(), accountId, receiverId);
             transfer.setStatus(APPROVED);
             transferDao.completeTransfer(transfer);
@@ -95,17 +95,14 @@ public class AccountController {
         return transfer;
     }
 
-//    @RequestMapping (path = "/deleteall", method = RequestMethod.DELETE)
-//    public void delete() {
-//        userDao.deleteEverything();
-//    }
-
     @RequestMapping(path = "/{accountId}/transfers/{transferId}", method = RequestMethod.PUT)
-    public void completeTransfer() {
+    public void completeTransfer(Transfer transfer) {
+        transfer.setStatus(APPROVED);
+        transferDao.completeTransfer(transfer);
     }
 
     public boolean isNotAuthorized(int accountId, Principal principal) {
-        return accountDao.findAccountIdByUserId(userDao.findIdByUsername(principal.getName())) == accountId;
+        return !(accountDao.findAccountIdByUserId(userDao.findIdByUsername(principal.getName())) == accountId);
     }
 }
 
