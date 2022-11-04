@@ -11,6 +11,7 @@ import static com.techelevator.tenmo.model.Status.*;
 
 public class Transfer {
     @NotNull
+    @JsonIgnore
     private int transferId;
     @NotNull
     @JsonFormat (shape = JsonFormat.Shape.STRING)

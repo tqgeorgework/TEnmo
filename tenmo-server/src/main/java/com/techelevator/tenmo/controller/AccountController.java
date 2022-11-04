@@ -34,12 +34,9 @@ public class AccountController {
         this.userDao = userDao;
     }
 
-    //Todo
-    //method is feeding wrong information to accountDao.getBalance, need to resolve so that user can input Account Id and receive expected result
-
     @RequestMapping(path = "/{accountId}/balance", method = RequestMethod.GET)
     public BigDecimal getBalance(@PathVariable int accountId, Principal principal) {
-        if (!(accountDao.findAccountIdByUserId(userDao.findIdByUsername(principal.getName())) == accountId)) {
+        if (isNotAuthorized(accountId, principal)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot access another user's balance");
         }
         return accountDao.getBalance(accountId);
@@ -47,12 +44,18 @@ public class AccountController {
 
     @RequestMapping(path = "/{accountId}/transfers/{receiverId}/{transferId}", method = RequestMethod.GET)
     public Transfer getThisTransfer(@PathVariable int accountId, @PathVariable int receiverId,
-                                    @PathVariable int transferId) {
+                                    @PathVariable int transferId, Principal principal) {
+        if (isNotAuthorized(accountId, principal) && isNotAuthorized(receiverId, principal)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot view another user's transactions");
+        }
         return transferDao.getTransfer(transferId);
     }
 
     @RequestMapping(path = "/{accountId}/transfers", method = RequestMethod.GET)
-    public List<Transfer> getTransfers(@PathVariable int accountId) {
+    public List<Transfer> getTransfers(@PathVariable int accountId, Principal principal) {
+        if (isNotAuthorized(accountId, principal)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot view another user's transactions");
+        }
         return transferDao.getTransfers(accountId);
     }
 
@@ -73,18 +76,19 @@ public class AccountController {
 
     @RequestMapping(path = "/{accountId}/transfers/{receiverId}/", method = RequestMethod.POST)
     public Transfer createTransfer(@PathVariable int accountId, @PathVariable int receiverId,
-                                 @RequestBody BigDecimal amount, Principal principal) {
-        Transfer transfer;
+                                   @RequestBody Transfer transfer, Principal principal) {
         //Todo Implement principal
         // question about JSON syntax w/ transferring amount
-        if (amount.compareTo(accountDao.getBalance(accountId)) > 0) {
+        if (isNotAuthorized(accountId, principal)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot initiate a transfer for another user's account");
+        } else if (transfer.getAmount().compareTo(accountDao.getBalance(accountId)) > 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient Funds");
-        } else if (amount.compareTo(BigDecimal.ZERO) < 0) {
+        } else if (transfer.getAmount().compareTo(BigDecimal.ZERO) < 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot send negative amounts");
         } else if (accountId == receiverId) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot send funds to yourself");
         } else {
-            transfer = transferDao.createTransfer(amount, accountId, receiverId);
+            transfer = transferDao.createTransfer(transfer.getAmount(), accountId, receiverId);
             transfer.setStatus(APPROVED);
             transferDao.completeTransfer(transfer);
         }
@@ -96,8 +100,12 @@ public class AccountController {
 //        userDao.deleteEverything();
 //    }
 
-    @RequestMapping (path = "/{accountId}/transfers/{transferId}", method = RequestMethod.PUT)
+    @RequestMapping(path = "/{accountId}/transfers/{transferId}", method = RequestMethod.PUT)
     public void completeTransfer() {
+    }
+
+    public boolean isNotAuthorized(int accountId, Principal principal) {
+        return accountDao.findAccountIdByUserId(userDao.findIdByUsername(principal.getName())) == accountId;
     }
 }
 
